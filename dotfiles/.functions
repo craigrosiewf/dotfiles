@@ -1,0 +1,387 @@
+# Simple calculator
+function calc() {
+    local result="";
+    result="$(printf "scale=10;$*\n" | bc --mathlib | tr -d '\\\n')";
+    #                       └─ default (when `--mathlib` is used) is 20
+    #
+    if [[ "$result" == *.* ]]; then
+        # improve the output for decimal numbers
+        printf "$result" |
+        sed -e 's/^\./0./'        `# add "0" for cases like ".5"` \
+            -e 's/^-\./-0./'      `# add "0" for cases like "-.5"`\
+            -e 's/0*$//;s/\.$//';  # remove trailing zeros
+    else
+        printf "$result";
+    fi;
+    printf "\n";
+}
+
+# Create a new directory and enter it
+function mkd() {
+    mkdir -p "$@" && cd "$_";
+}
+
+# Change working directory to the top-most Finder window location
+function cdf() { # short for `cdfinder`
+    cd "$(osascript -e 'tell app "Finder" to POSIX path of (insertion location as alias)')";
+}
+
+# Create a .tar.gz archive, using `zopfli`, `pigz` or `gzip` for compression
+function targz() {
+    local tmpFile="${@%/}.tar";
+    tar -cvf "${tmpFile}" --exclude=".DS_Store" "${@}" || return 1;
+
+    size=$(
+        stat -f"%z" "${tmpFile}" 2> /dev/null; # OS X `stat`
+        stat -c"%s" "${tmpFile}" 2> /dev/null # GNU `stat`
+    );
+
+    local cmd="";
+    if (( size < 52428800 )) && hash zopfli 2> /dev/null; then
+        # the .tar file is smaller than 50 MB and Zopfli is available; use it
+        cmd="zopfli";
+    else
+        if hash pigz 2> /dev/null; then
+            cmd="pigz";
+        else
+            cmd="gzip";
+        fi;
+    fi;
+
+    echo "Compressing .tar using \`${cmd}\`…";
+    "${cmd}" -v "${tmpFile}" || return 1;
+    [ -f "${tmpFile}" ] && rm "${tmpFile}";
+    echo "${tmpFile}.gz created successfully.";
+}
+
+# Use Git’s colored diff when available
+hash git &>/dev/null;
+if [ $? -eq 0 ]; then
+    function diff() {
+        git diff --no-index --color-words "$@";
+    }
+fi;
+
+# Create a data URL from a file
+function dataurl() {
+    local mimeType=$(file -b --mime-type "$1");
+    if [[ $mimeType == text/* ]]; then
+        mimeType="${mimeType};charset=utf-8";
+    fi
+    echo "data:${mimeType};base64,$(openssl base64 -in "$1" | tr -d '\n')";
+}
+
+# Create a git.io short URL
+function gitio() {
+    if [ -z "${1}" -o -z "${2}" ]; then
+        echo "Usage: \`gitio slug url\`";
+        return 1;
+    fi;
+    curl -i http://git.io/ -F "url=${2}" -F "code=${1}";
+}
+
+# Start an HTTP server from a directory, optionally specifying the port
+function server() {
+    local port="${1:-8000}";
+    sleep 1 && open "http://localhost:${port}/" &
+    # Set the default Content-Type to `text/plain` instead of `application/octet-stream`
+    # And serve everything as UTF-8 (although not technically correct, this doesn’t break anything for binary files)
+    python -c $'import SimpleHTTPServer;\nmap = SimpleHTTPServer.SimpleHTTPRequestHandler.extensions_map;\nmap[""] = "text/plain";\nfor key, value in map.items():\n\tmap[key] = value + ";charset=UTF-8";\nSimpleHTTPServer.test();' "$port";
+}
+
+# Start a PHP server from a directory, optionally specifying the port
+# (Requires PHP 5.4.0+.)
+function phpserver() {
+    local port="${1:-4000}";
+    local ip=$(ipconfig getifaddr en1);
+    sleep 1 && open "http://${ip}:${port}/" &
+    php -S "${ip}:${port}";
+}
+
+# Compare original and gzipped file size
+function gz() {
+    local origsize=$(wc -c < "$1");
+    local gzipsize=$(gzip -c "$1" | wc -c);
+    local ratio=$(echo "$gzipsize * 100 / $origsize" | bc -l);
+    printf "orig: %d bytes\n" "$origsize";
+    printf "gzip: %d bytes (%2.2f%%)\n" "$gzipsize" "$ratio";
+}
+
+# Syntax-highlight JSON strings or files
+# Usage: `json '{"foo":42}'` or `echo '{"foo":42}' | json`
+function json() {
+    if [ -t 0 ]; then # argument
+        python -mjson.tool <<< "$*" | pygmentize -l javascript;
+    else # pipe
+        python -mjson.tool | pygmentize -l javascript;
+    fi;
+}
+
+# Run `dig` and display the most useful info
+function digga() {
+    dig +nocmd "$1" any +multiline +noall +answer;
+}
+
+# UTF-8-encode a string of Unicode symbols
+function escape() {
+    printf "\\\x%s" $(printf "$@" | xxd -p -c1 -u);
+    # print a newline unless we’re piping the output to another program
+    if [ -t 1 ]; then
+        echo ""; # newline
+    fi;
+}
+
+# Decode \x{ABCD}-style Unicode escape sequences
+function unidecode() {
+    perl -e "binmode(STDOUT, ':utf8'); print \"$@\"";
+    # print a newline unless we’re piping the output to another program
+    if [ -t 1 ]; then
+        echo ""; # newline
+    fi;
+}
+
+# Get a character’s Unicode code point
+function codepoint() {
+    perl -e "use utf8; print sprintf('U+%04X', ord(\"$@\"))";
+    # print a newline unless we’re piping the output to another program
+    if [ -t 1 ]; then
+        echo ""; # newline
+    fi;
+}
+
+# Show all the names (CNs and SANs) listed in the SSL certificate
+# for a given domain
+function getcertnames() {
+    if [ -z "${1}" ]; then
+        echo "ERROR: No domain specified.";
+        return 1;
+    fi;
+
+    local domain="${1}";
+    echo "Testing ${domain}…";
+    echo ""; # newline
+
+    local tmp=$(echo -e "GET / HTTP/1.0\nEOT" \
+        | openssl s_client -connect "${domain}:443" -servername "${domain}" 2>&1);
+
+    if [[ "${tmp}" = *"-----BEGIN CERTIFICATE-----"* ]]; then
+        local certText=$(echo "${tmp}" \
+            | openssl x509 -text -certopt "no_aux, no_header, no_issuer, no_pubkey, \
+            no_serial, no_sigdump, no_signame, no_validity, no_version");
+        echo "Common Name:";
+        echo ""; # newline
+        echo "${certText}" | grep "Subject:" | sed -e "s/^.*CN=//" | sed -e "s/\/emailAddress=.*//";
+        echo ""; # newline
+        echo "Subject Alternative Name(s):";
+        echo ""; # newline
+        echo "${certText}" | grep -A 1 "Subject Alternative Name:" \
+            | sed -e "2s/DNS://g" -e "s/ //g" | tr "," "\n" | tail -n +2;
+        return 0;
+    else
+        echo "ERROR: Certificate not found.";
+        return 1;
+    fi;
+}
+
+# `s` with no arguments opens the current directory in Sublime Text, otherwise
+# opens the given location
+function s() {
+    if [ $# -eq 0 ]; then
+        subl .;
+    else
+        subl "$@";
+    fi;
+}
+
+# `a` with no arguments opens the current directory in Atom Editor, otherwise
+# opens the given location
+function a() {
+    if [ $# -eq 0 ]; then
+        atom .;
+    else
+        atom "$@";
+    fi;
+}
+
+# `o` with no arguments opens the current directory, otherwise opens the given
+# location
+function o() {
+    if [ $# -eq 0 ]; then
+        open .;
+    else
+        open "$@";
+    fi;
+}
+
+# `tre` is a shorthand for `tree` with hidden files and color enabled, ignoring
+# the `.git` directory, listing directories first. The output gets piped into
+# `less` with options to preserve color and line numbers, unless the output is
+# small enough for one screen.
+function tre() {
+    tree -aC -I '.git|node_modules|bower_components' --dirsfirst "$@" | less -FRNX;
+}
+
+# creating a new python project
+# create dir, cd, create pyenv virtualenv, run pipup (alias), pylint, requirements.txt
+function pynew() {
+    echo "[INFO]: creating directory (if required) ${1}..." &&
+    mkdir -p "$1" && cd "$1" &&
+    echo "[INFO]: created directory ${1}" &&
+    echo "[INFO]: creating pyenv virtualenv ${2} ${1}-${2}..." &&
+    pyenv virtualenv "$2" "$1"-"$2" &&
+    echo "[INFO]: created pyenv virtualenv ${1}-${2}" &&
+    echo "[INFO]: setting pyenv local ${1}-${2}..." &&
+    pyenv local "$1"-"$2" &&
+    echo "[INFO]: set local pyenv to ${1}-${2}" &&
+    echo "[INFO]: running pipup..." &&
+    pipup &&
+    echo "[INFO]: pipup complete - pip updated" &&
+    echo "[INFO]: installing pylint..." &&
+    pip install pylint &&
+    echo "[INFO]: installed pylint" &&
+    echo "[INFO]: installing pip-tools..." &&
+    pip install pip-tools &&
+    echo "[INFO]: installed pip-tools" &&
+    echo "[INFO]: checking if requirements.txt exists..." &&
+    [ -e "requirements.txt" ] &&
+    echo "[INFO]: requirements.txt exists - installing..." &&
+    pip install -r requirements.txt &&
+    echo "[INFO]: installed requirements.txt";
+}
+
+# create a backup of a file
+function bak() {
+	cp ${1}{,.bak}
+	echo "Created ${1}.bak"
+}
+
+# find common lines in multiple files (arg must be wrapped in " ")
+function commlines() {
+	sort $1 | uniq -c | sort -n
+	echo "COMMAND: sort ${1} | uniq -c | sort -n"
+}
+
+function compresspdf() {
+	gs -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dPDFSETTINGS=/ebook -dNOPAUSE -dQUIET -dBATCH -sOutputFile=${2} ${1}
+}
+
+# exec straight into container without docker ps nonsense
+function dbash() {
+	echo "COMMAND: docker exec -it $(docker ps -q -f name=${1}) bash"
+	docker exec -it $(docker ps -q -f name=${1}) bash
+}
+
+# stream logs for container without docker ps nonsense
+function dlogs() {
+	echo "COMMAND: docker logs -f $(docker ps -q -f name=${1})"
+	docker logs -f $(docker ps -q -f name=${1})
+}
+
+# use fzf to checkout git branches
+function fbr() {
+  local branches branch
+  branches=$(git branch --all | grep -v HEAD) &&
+  branch=$(echo "$branches" |
+           fzf -d $(( 2 + $(wc -l <<< "$branches") )) +m) &&
+  git checkout $(echo "$branch" | sed "s/.* //" | sed "s#remotes/[^/]*/##")
+}
+
+# Enable <C-g><C-b> shortcut for selecting a git branch using fzf
+fzf_is_in_git_repo() {
+  git rev-parse HEAD > /dev/null 2>&1
+}
+
+fzf-down() {
+  fzf --height 50% --min-height 20 --border --bind ctrl-/:toggle-preview "$@"
+}
+
+
+_fzf_gb() {
+  fzf_is_in_git_repo || return
+  git branch -a --color=always | grep -v '/HEAD\s' | sort |
+  fzf-down --ansi --multi --tac --preview-window right:50% \
+    --preview 'git log --oneline --graph --date=short --color=always --pretty="format:%C(auto)%cd %h%d %s" $(sed s/^..// <<< {} | cut -d" " -f1)' |
+  sed 's/^..//' | cut -d' ' -f1 |
+  sed 's#^remotes/##'
+}
+
+bind '"\C-g\C-b": "$(_fzf_gb)\e\C-e\er"'
+
+# combine fasd & fzf for ultimate directory changing!
+function c() {
+  local dir
+  dir="$(fasd -Rdl "$1" | fzf -1 -0 --no-sort +m)" && cd "${dir}" || return 1
+}
+
+# get the git host homepage for a repo
+function git-url() {
+    local origin_ssh_url host repo_name
+    origin_ssh_url=$(git config --get remote.${1-origin}.url)
+    host=$(echo $origin_ssh_url | sed 's/^.*@//g;s/:.*$//g')
+    if [ "$host" = "gh" ]; then
+        host="github.com"
+    fi
+    repo_name=$(echo $origin_ssh_url | sed 's/^.*://g;s/\.git//g')
+    echo "https://$host/$repo_name"
+}
+
+# open the git host homepage for a repo
+function og() {
+    local arg remote
+    if [ "$#" -eq 1 ]; then
+        remote="origin"
+        arg=$1
+    else
+        remote=$1
+        arg=$2
+    fi
+
+    case "$arg" in
+        branch)
+            open $(git-url $remote)/tree/$(git branch --show-current)
+            ;;
+        pulls)
+            open $(git-url $remote)/pulls
+            ;;
+        me)
+            open $(git-url $remote)/pulls/$(git config github.user)
+            ;;
+        releases)
+            open $(git-url $remote)/releases
+            ;;
+        latest)
+            open $(git-url $remote)/releases/latest
+            ;;
+        commits)
+            open $(git-url $remote)/commits
+            ;;
+        pr)
+            open $(git-url $remote)/pull/new/$(git symbolic-ref HEAD | sed 's/refs\/heads\///g')
+            ;;
+        *)
+            open $(git-url $remote)
+    esac
+}
+
+# open the "New PR" page for a repo and the current branch (github only)
+function og-pr() {
+    local url
+    url=$(git-url)
+    open "$url/pull/new/$(git symbolic-ref HEAD | sed 's/refs\/heads\///g')"
+}
+
+function asciify-url() {
+    echo $1 | recode html..ascii
+}
+
+# Show ssh keys added to ssh agent with filename
+# https://unix.stackexchange.com/a/566474
+function ssh-add-wf() {
+    while read -r line; do
+        for file in ~/.ssh/*.pub;
+        do
+            printf "%s %s\n" "$(ssh-keygen -lf "$file" | awk '{$1=""}1')" "$file";
+        done | column -t | grep --color=auto "$line" || echo "$line";
+    done < <(ssh-add -l | awk '{print $2}')
+}
+

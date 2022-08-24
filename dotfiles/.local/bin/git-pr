@@ -1,7 +1,0 @@
-#!/bin/bash
-set -euo pipefail
-
-BRANCH="$(git rev-parse --abbrev-ref HEAD)"
-
-git push -u origin "$BRANCH"
-eval $BROWSER "https://github.com/wayflyer/$(basename $(pwd))/pull/new/$BRANCH"

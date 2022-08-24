@@ -1,0 +1,191 @@
+# Heavily, heavily inspired by github.com/donnemartin/dev-setup
+alias ..="cd .."
+alias ...="cd ../.."
+alias ....="cd ../../.."
+
+alias drop="cd ~/Dropbox"
+alias dl="cd ~/Downloads"
+alias g="git"
+alias v="vim"
+alias h="history"
+alias ping="ping -c 4"
+
+alias cls="clear"
+
+# Detect which `ls` flavor is in use
+if ls --color > /dev/null 2>&1; then # GNU `ls`
+    colourflag="--color"
+else # OS X `ls`
+    colourflag="-G"
+fi
+
+# List all files colourized in long format
+alias l="ls -lF"
+
+# List all files colourized in long format, including dot files
+alias la="ls -lAF --color -h --group-directories-first"
+
+# List only directories (excellent alias name)
+alias lsd="ls -lF ${colourflag} | grep --color=never '^d'"
+
+# Always use color output for `ls`
+alias ls="command ls --color -w 80"
+export LS_COLORS='no=00:fi=00:di=01;34:ln=01;36:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arj=01;31:*.taz=01;31:*.lzh=01;31:*.zip=01;31:*.z=01;31:*.Z=01;31:*.gz=01;31:*.bz2=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.jpg=01;35:*.jpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.avi=01;35:*.fli=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.ogg=01;35:*.mp3=01;35:*.wav=01;35:'
+
+# Enable aliases to be sudo'ed
+alias sudo="sudo "
+
+# IPs
+alias ip="ipconfig getifaddr en0"
+alias extip="dig +short myip.opendns.com @resolver1.opendns.com"
+
+# View HTTP traffic
+alias sniff="sudo ngrep -d 'en1' -t '^(GET|POST) ' 'tcp and port 80'"
+alias httpdump="sudo tcpdump -i en1 -n -s 0 -w - | grep -a -o -E \"Host\: .*|GET \/.*\""
+
+# Lock the screen
+alias afk="/System/Library/CoreServices/Menu\ Extras/User.menu/Contents/Resources/CGSession -suspend"
+
+# Ping Google to quickly test connection issues
+alias pg="ping -c 4 www.google.com"
+
+# Update brew and brew-cask
+alias brewup="brew update && brew upgrade && brew cleanup"
+
+# Refresh all the dotfiles!
+alias rebash="source ~/.bashrc"
+
+# Upgrade pip
+alias pipup="pip install --upgrade pip"
+
+# Upgrade pip package
+alias pipu="pip install -U"
+
+# Show hidden files in Finder
+alias showfiles="defaults write com.apple.finder AppleShowAllFiles YES; killall Finder /System/Library/CoreServices/Finder.app"
+
+# Hide hidden files in Finder
+alias hidefiles="defaults write com.apple.finder AppleShowAllFiles NO; killall Finder /System/Library/CoreServices/Finder.app"
+
+# Show desktop icons
+alias showdesktop="defaults write com.apple.finder CreateDesktop -bool true && killall Finder /System/Library/CoreServices/Finder.app"
+
+# Hide desktop icons
+alias hidedesktop="defaults write com.apple.finder CreateDesktop -bool false && killall Finder /System/Library/CoreServices/Finder.app"
+
+# Always sudo htop
+alias htop="sudo htop"
+
+# List files/directories by human readable size (requires coreutils)
+alias sizes="du -ahd1 | sort -h"
+
+# Shorten docker
+alias dk="docker"
+
+# Shorten docker-machine
+alias dm="docker-machine"
+
+# Shorten docker-compose
+alias dc="docker-compose"
+
+# Alias to delete all docker containers
+alias drac="docker rm -f \$(docker ps -q -f status=exited)"
+
+# Alias to delete all docker images
+alias drai="docker rmi \$(docker images -q)"
+
+# Alias to show docker stats by container name
+alias dstats="docker stats \$(docker ps --format \"{{.Names}}\" | sort)"
+
+# More readable docker ps
+alias dps="docker ps --format \"table {{.ID}}\t{{.Names}}\t{{.Image}}\t{{.Ports}}\""
+
+# Always show line numbers and highlight matches in grep
+alias grep="grep --colour=auto -i"
+
+# Typing make is hard
+alias m="make"
+
+# Install common Python utils
+alias pyhelp="pip install --upgrade flake8 ipdb ipython jupyter pdir2 ptpython pudb show"
+
+# IPython alias
+alias ipy="ipython"
+
+# ptpython alias
+alias ptp="ptpython"
+
+# ptipython alias
+alias pti="ptipython --vi"
+
+# pip install alias
+alias pi="pip install -U"
+
+# Search pip installed packages
+alias pipgrep="pip freeze | grep"
+
+# spotify (shpotify) alias
+alias sp="spotify"
+
+# peco alias
+alias p="peco"
+
+# Use ag & fzf to search files contents in current dir
+alias fif="ag --nobreak --nonumbers --noheading . | fzf"
+
+# Add ff alias for fzf because z is hard to type :(
+alias ff="fzf"
+
+# Alias ccat to cat
+alias cat="bat"
+
+# Alias xmllint --format
+alias xf="xmllint --format"
+
+# Alias gron --ungron
+alias ungron="gron --ungron"
+
+# Default ctop to only show running containers
+alias ctop="ctop -a"
+
+# Uninstall all pip packages
+alias pipclean="pip freeze | grep -v \"github\" | grep -v '@' | grep -v '#' | xargs pip uninstall -y"
+
+# emojify is just too long to type
+alias emo="emojify"
+
+# Everybody loves ¯\_(ツ)_/¯
+alias shrug="echo \"¯\_(ツ)_/¯\" | pbcopy"
+
+# Everybody loves ¯\_(ツ)_/¯ (escaped)
+alias eshrug="echo \"¯\\\\\_(ツ)\_/¯\" | pbcopy"
+
+# Copy .ignore file to current dir
+alias cpignore="cp ~/github/prefs/osx/.ignore ."
+
+# Better PATH printing
+alias pathy="env | grep -E "^PATH=" | sed 's/PATH=//g' | tr : '\n' | sort | uniq"
+
+# I'm tired of typing ps aux | grep <blah>
+alias psgrep="ps aux | grep -v grep | grep"
+
+# Better less
+# -F: quit if one screen
+# -R: preserve colour
+# -X: don't clear the screen
+alias less="less -FRX"
+
+alias help="tldr"
+
+alias ktx="kubectx"
+
+alias kns="kubens"
+
+# Format json in clipboard
+alias jf="pbpaste | jq | pbcopy"
+
+# I'm always typing vim wrong
+alias ivm="vim"
+
+# Wrap lines in "",
+alias stringify="sed 's/.*/\"&\",/'"
