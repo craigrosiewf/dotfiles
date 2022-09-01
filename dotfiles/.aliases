@@ -136,8 +136,10 @@ alias fif="ag --nobreak --nonumbers --noheading . | fzf"
 # Add ff alias for fzf because z is hard to type :(
 alias ff="fzf"
 
-# Alias ccat to cat
-alias cat="bat"
+# Alias bat(cat) to cat
+# (bat is installed as batcat in linux to avoid clash with (possible) existing
+# bat package)
+alias cat="batcat"
 
 # Alias xmllint --format
 alias xf="xmllint --format"
