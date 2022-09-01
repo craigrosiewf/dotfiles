@@ -4,6 +4,7 @@ from pathlib import Path
 
 LINUX_PACKAGES = [
     "bat",
+    "fasd",
     "silversearcher-ag",
     "tig",
 ]
