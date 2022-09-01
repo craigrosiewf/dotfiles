@@ -12,7 +12,10 @@ def install(dotfiles_dir_path: Path, dir_path: Path) -> None:
                 local_path.mkdir()
             install(dotfiles_dir_path, entry_path)
         else:
-            local_path.symlink_to(entry_path)
+            if local_path.name == ".bashrc":
+                os.system(f"cat {entry_path_rel} >> {local_path}")
+            else:
+                local_path.symlink_to(entry_path)
 
 def main() -> None:
     dotfiles_dir_path = Path(__file__).parent / "dotfiles"
