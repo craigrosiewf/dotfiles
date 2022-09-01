@@ -12,7 +12,7 @@ def install_linux_packages():
     print("Running `apt update`")
     os.system("apt-get update -y")
     for package in LINUX_PACKAGES:
-        print("Installing `{package}`")
+        print(f"Installing `{package}`")
         os.system(f"apt-get install -y {package}")
     print("Finished installing linux packages")
 
