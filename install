@@ -2,7 +2,40 @@
 import os
 from pathlib import Path
 
+LINUX_PACKAGES = [
+    "bat",
+    "silversearcher-ag",
+    "tig",
+]
+
+def install_linux_packages():
+    print("Running `apt update`")
+    os.system("apt-get update -y")
+    for package in LINUX_PACKAGES:
+        print("Installing `{package}`")
+        os.system(f"apt-get install -y {package}")
+    print("Finished installing linux packages")
+
+def install_fzf():
+    print("Installing fzf")
+    os.system("git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf")
+    os.system("~/.fzf/install --key-bindings --completion --no-update-rc")
+    print("Finished installing fzf")
+
+def install_vundle():
+    print("Installing vundle")
+    os.system("git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim")
+    print("Installing vim plugins")
+    os.system("vim +PluginInstall +qall")
+    print("Ensure coc.nvim branch is release")
+    os.system("cd ~/.vim/bundle/coc.nvim; git checkout release; cd -")
+    print("Finished installing vundle")
+
 def install(dotfiles_dir_path: Path, dir_path: Path) -> None:
+    install_fzf()
+    install_linux_packages()
+    install_vundle()
+
     for entry in os.scandir(dir_path):
         entry_path = dir_path / entry.name
         entry_path_rel = entry_path.relative_to(dotfiles_dir_path)
