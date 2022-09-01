@@ -13,10 +13,11 @@ def install(dotfiles_dir_path: Path, dir_path: Path) -> None:
             install(dotfiles_dir_path, entry_path)
         else:
             print(f"{entry_path_rel=}")
+            print(f"{entry_path=}")
             print(f"{local_path=}")
             if local_path.name == ".bashrc":
-                print(f"Executing `cat {entry_path_rel.absolute()} >> {local_path}`")
-                os.system(f"cat {entry_path_rel.absolute()} >> {local_path}")
+                print(f"Executing `cat {entry_path} >> {local_path}`")
+                os.system(f"cat {entry_path} >> {local_path}")
             else:
                 local_path.symlink_to(entry_path)
 
