@@ -28,7 +28,7 @@ def install_vundle():
     print("Installing vim plugins")
     os.system("vim +PluginInstall +qall")
     print("Ensure coc.nvim branch is release")
-    os.system("cd ~/.vim/bundle/coc.nvim; git checkout release; cd -")
+    os.system("cd ~/.vim/bundle/coc.nvim && git checkout release && cd -")
     print("Finished installing vundle")
 
 def install(dotfiles_dir_path: Path, dir_path: Path) -> None:
