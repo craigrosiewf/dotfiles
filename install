@@ -15,7 +15,7 @@ def install(dotfiles_dir_path: Path, dir_path: Path) -> None:
             print(f"{entry_path_rel=}")
             print(f"{local_path=}")
             if local_path.name == ".bashrc":
-                os.system(f"cat {entry_path_rel} >> {local_path}")
+                os.system(f"cat {entry_path_rel.absolute()} >> {local_path}")
             else:
                 local_path.symlink_to(entry_path)
 
