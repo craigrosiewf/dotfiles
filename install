@@ -34,7 +34,6 @@ def install_vundle():
 def install(dotfiles_dir_path: Path, dir_path: Path) -> None:
     install_fzf()
     install_linux_packages()
-    install_vundle()
 
     for entry in os.scandir(dir_path):
         entry_path = dir_path / entry.name
@@ -53,6 +52,9 @@ def install(dotfiles_dir_path: Path, dir_path: Path) -> None:
                 os.system(f"cat {entry_path} >> {local_path}")
             else:
                 local_path.symlink_to(entry_path)
+
+    # Install vundle last because it requires .vimrc
+    install_vundle()
 
 def main() -> None:
     dotfiles_dir_path = Path(__file__).parent / "dotfiles"
