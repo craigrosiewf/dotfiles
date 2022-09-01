@@ -25,10 +25,6 @@ def install_fzf():
 def install_vundle():
     print("Installing vundle")
     os.system("git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim")
-    print("Installing vim plugins")
-    os.system("vim +PluginInstall +qall")
-    print("Ensure coc.nvim branch is release")
-    os.system("cd ~/.vim/bundle/coc.nvim && git checkout release && cd -")
     print("Finished installing vundle")
 
 def install(dotfiles_dir_path: Path, dir_path: Path) -> None:
