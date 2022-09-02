@@ -129,18 +129,19 @@ set showmatch
 " Enable backspace in insert mode
 set backspace=indent,eol,start
 
+" DEVCONTAINER disable backups
 " Enable backups
-set backup
-set writebackup
+" set backup
+" set writebackup
 
 " Set backup directory
-set backupdir=~/.vim/backups
+" set backupdir=~/.vim/backups
 
 " Skip creating backups of files in sensitive directories
-set backupskip=/tmp/*,/private/tmp/*
+" set backupskip=/tmp/*,/private/tmp/*
 
 " Set swapfile directory
-set directory=~/.vim/swaps
+" set directory=~/.vim/swaps
 
 " Better searching
 set ignorecase
