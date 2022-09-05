@@ -49,5 +49,8 @@ export EDITOR=`command -v vim`
 # https://switowski.com/blog/disable-pip-outside-of-virtual-environments
 export PIP_REQUIRE_VIRTUALENV=true
 
+# Make vim the default git editor
+export GIT_EDITOR=vim
+
 echo "System online ✔︎"
 
