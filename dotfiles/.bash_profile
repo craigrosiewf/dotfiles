@@ -20,7 +20,7 @@ done;
 [[ -r "/etc/profile.d/bash_completion.sh" ]] && . "/etc/profile.d/bash_completion.sh"
 
 # Enable tab completion for `g` by marking it as an alias for `git`
-if type __git_wrap__git_main &> /dev/null && [ -f .git-completion.bash ]; then
+if type __git_wrap__git_main &> /dev/null && [ -f /root/.git-completion.bash ]; then
     complete -o default -o nospace -F __git_wrap__git_main g
 fi;
 
