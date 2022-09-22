@@ -5,6 +5,7 @@ from pathlib import Path
 LINUX_PACKAGES = [
     "bat",
     "fasd",
+    "lsof",
     "silversearcher-ag",
     "tig",
 ]
