@@ -25,5 +25,8 @@ ro-shell:  ## start a read-only shell on prod data
 	export DJANGO_ALLOW_ASYNC_UNSAFE=true
 	ipython -i /workspaces/dotfiles/dotfiles/ro_shell.py
 
+migrations:
+	./bin/m makemigrations
+
 .PHONY: help run refresh login ro-shell
 
