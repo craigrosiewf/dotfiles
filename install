@@ -50,7 +50,7 @@ def install_neovim():
     os.system("mkdir -p ~/.config/nvim/lua")
     os.system("wget https://raw.githubusercontent.com/craigrosie/prefs/master/neovim/init.lua -O ~/.config/nvim/init.lua")
     os.system("wget https://raw.githubusercontent.com/craigrosie/prefs/master/neovim/lua/plugins.lua -O ~/.config/nvim/lua/plugins.lua")
-    os.system("git clone --depth 1 https://github.com/wbthomason/packer.nvim ~/.local/share/nvim/site/pack/packer/start/packer.nvim")
+    os.system("git clone --depth 1 https://github.com/wbthomason/packer.nvim /usr/local/share/nvim/site/pack/packer/start/packer.nvim")
     log("Finished installing neovim")
 
 def install_vundle():
