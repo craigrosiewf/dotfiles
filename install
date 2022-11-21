@@ -46,10 +46,7 @@ def install_fzf():
 def install_neovim():
     log("Installing neovim")
     os.system("git clone --depth 1 --branch v0.8.1 https://github.com/neovim/neovim /tmp/neovim")
-    os.system("cd /tmp/neovim")
-    os.system("make CMAKE_BUILD_TYPE=RelWithDebInfo")
-    os.system("make install")
-    os.system("cd -")
+    os.system("cd /tmp/neovim && make CMAKE_BUILD_TYPE=RelWithDebInfo && make install")
     os.system("mkdir -p ~/.config/nvim/lua")
     os.system("wget https://raw.githubusercontent.com/craigrosie/prefs/master/neovim/init.lua -O ~/.config/nvim/init.lua")
     os.system("wget https://raw.githubusercontent.com/craigrosie/prefs/master/neovim/lua/plugins.lua -O ~/.config/nvim/lua/plugins.lua")
