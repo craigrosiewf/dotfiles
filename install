@@ -2,36 +2,69 @@
 import os
 from pathlib import Path
 
+NEOVIM_LINUX_DEPS = [
+    "ninja-build",
+    "gettext",
+    "libtool",
+    "libtool-bin",
+    "autoconf",
+    "automake",
+    "cmake",
+    "g++",
+    "pkg-config",
+    "unzip",
+    "curl",
+    "doxygen"
+]
+
 LINUX_PACKAGES = [
     "bat",
     "fasd",
     "lsof",
     "silversearcher-ag",
     "tig",
+    *NEOVIM_LINUX_DEPS,
 ]
 
+def log(msg):
+    print(f"> {msg}")
+
 def install_linux_packages():
-    print("Running `apt update`")
+    log("Running `apt update`")
     os.system("apt-get update -y")
     for package in LINUX_PACKAGES:
-        print(f"Installing `{package}`")
+        log(f"Installing `{package}`")
         os.system(f"apt-get install -y {package}")
-    print("Finished installing linux packages")
+    log("Finished installing linux packages")
 
 def install_fzf():
-    print("Installing fzf")
+    log("Installing fzf")
     os.system("git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf")
     os.system("~/.fzf/install --key-bindings --completion --no-update-rc")
-    print("Finished installing fzf")
+    log("Finished installing fzf")
+
+def install_neovim():
+    log("Installing neovim")
+    os.system("git clone --depth 1 --branch v0.8.1 https://github.com/neovim/neovim /tmp/neovim")
+    os.system("cd /tmp/neovim")
+    os.system("make CMAKE_BUILD_TYPE=RelWithDebInfo")
+    os.system("make install")
+    os.system("cd -")
+    os.system("mkdir -p ~/.config/nvim/lua")
+    os.system("wget https://raw.githubusercontent.com/craigrosie/prefs/master/neovim/init.lua -O ~/.config/nvim/init.lua")
+    os.system("wget https://raw.githubusercontent.com/craigrosie/prefs/master/neovim/lua/plugins.lua -O ~/.config/nvim/lua/plugins.lua")
+    os.system("git clone --depth 1 https://github.com/wbthomason/packer.nvim ~/.local/share/nvim/site/pack/packer/start/packer.nvim")
+    log("Finished installing neovim")
 
 def install_vundle():
-    print("Installing vundle")
+    log("Installing vundle")
     os.system("git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim")
-    print("Finished installing vundle")
+    log("Finished installing vundle")
 
 def install(dotfiles_dir_path: Path, dir_path: Path) -> None:
     install_fzf()
     install_linux_packages()
+    install_neovim()
 
     for entry in os.scandir(dir_path):
         entry_path = dir_path / entry.name
@@ -42,11 +75,11 @@ def install(dotfiles_dir_path: Path, dir_path: Path) -> None:
                 local_path.mkdir()
             install(dotfiles_dir_path, entry_path)
         else:
-            print(f"{entry_path_rel=}")
-            print(f"{entry_path=}")
-            print(f"{local_path=}")
+            log(f"{entry_path_rel=}")
+            log(f"{entry_path=}")
+            log(f"{local_path=}")
             if local_path.name == ".bashrc":
-                print(f"Executing `cat {entry_path} >> {local_path}`")
+                log(f"Executing `cat {entry_path} >> {local_path}`")
                 os.system(f"cat {entry_path} >> {local_path}")
             else:
                 local_path.symlink_to(entry_path)
