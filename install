@@ -18,6 +18,7 @@ NEOVIM_LINUX_DEPS = [
 ]
 
 LINUX_PACKAGES = [
+    "ack",
     "bat",
     "fasd",
     "lsof",
@@ -51,6 +52,9 @@ def install_neovim():
     os.system("wget https://raw.githubusercontent.com/craigrosie/prefs/master/neovim/init.lua -O ~/.config/nvim/init.lua")
     os.system("wget https://raw.githubusercontent.com/craigrosie/prefs/master/neovim/lua/plugins.lua -O ~/.config/nvim/lua/plugins.lua")
     os.system("git clone --depth 1 https://github.com/wbthomason/packer.nvim /usr/local/share/nvim/site/pack/packer/start/packer.nvim")
+    os.system("mkdir -p /neovenv")
+    os.system("cd /neovenv && poetry new . && poetry add pynvim && cd -")
+    os.system("sed -i 's/\\/Users\\/craigrosie\\/.pyenv\\/versions\\/neovim-3.11.0/\\/neovenv\\/.venv/g' ~/.config/nvim/init.lua")
     log("Finished installing neovim")
 
 def install_vundle():
