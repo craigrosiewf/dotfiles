@@ -57,6 +57,13 @@ def install_neovim():
     os.system("sed -i 's/\\/Users\\/craigrosie\\/.pyenv\\/versions\\/neovim-3.11.0/\\/neovenv\\/.venv/g' ~/.config/nvim/init.lua")
     log("Finished installing neovim")
 
+def install_snippets():
+    log("Installing snippets")
+    os.system("mkdir -p ~/.config/nvim/custom_snippets")
+    os.system("wget https://raw.githubusercontent.com/craigrosie/prefs/master/vim/ultisnips/markdown.snippets -O ~/.config/nvim/custom_snippets/markdown.snippets")
+    os.system("wget https://raw.githubusercontent.com/craigrosie/prefs/master/vim/ultisnips/python.snippets -O ~/.config/nvim/custom_snippets/python.snippets")
+    log("Finshed installing snippets")
+
 def install_vundle():
     log("Installing vundle")
     os.system("git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim")
@@ -66,6 +73,7 @@ def install(dotfiles_dir_path: Path, dir_path: Path) -> None:
     install_fzf()
     install_linux_packages()
     install_neovim()
+    install_snippets()
 
     for entry in os.scandir(dir_path):
         entry_path = dir_path / entry.name
