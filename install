@@ -14,7 +14,7 @@ NEOVIM_LINUX_DEPS = [
     "pkg-config",
     "unzip",
     "curl",
-    "doxygen"
+    "doxygen",
 ]
 
 LINUX_PACKAGES = [
@@ -24,6 +24,7 @@ LINUX_PACKAGES = [
     "lsof",
     "silversearcher-ag",
     "tig",
+    "universal-ctags",
     *NEOVIM_LINUX_DEPS,
 ]
 
