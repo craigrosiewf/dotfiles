@@ -191,3 +191,6 @@ alias ivm="vim"
 
 # Wrap lines in "",
 alias stringify="sed 's/.*/\"&\",/'"
+
+# Fix SHELL in neovim
+alias nvim="SHELL=/bin/bash nvim"
