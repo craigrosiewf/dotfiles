@@ -54,8 +54,9 @@ def install_neovim():
     os.system("wget https://raw.githubusercontent.com/craigrosie/prefs/master/neovim/lua/plugins.lua -O ~/.config/nvim/lua/plugins.lua")
     os.system("git clone --depth 1 https://github.com/wbthomason/packer.nvim /usr/local/share/nvim/site/pack/packer/start/packer.nvim")
     os.system("mkdir -p /neovenv")
-    os.system("cd /neovenv && poetry new . && poetry add pynvim && cd -")
+    os.system("cd /neovenv && poetry new . && poetry add pynvim && poetry add debugpy && cd -")
     os.system("sed -i 's/\\/Users\\/craigrosie\\/.pyenv\\/versions\\/neovim-3.11.0/\\/neovenv\\/.venv/g' ~/.config/nvim/init.lua")
+    os.system("sed -i 's/~\\/.pyenv\\/versions\\/debugpy-3.11.0/\\/neovenv\\/.venv/g' ~/.config/nvim/init.lua")
     log("Finished installing neovim")
 
 def install_snippets():
