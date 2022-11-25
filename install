@@ -22,6 +22,7 @@ LINUX_PACKAGES = [
     "bat",
     "fasd",
     "lsof",
+    "ripgrep",
     "silversearcher-ag",
     "tig",
     "universal-ctags",
