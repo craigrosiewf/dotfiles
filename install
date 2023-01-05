@@ -97,7 +97,8 @@ def install(dotfiles_dir_path: Path, dir_path: Path) -> None:
                 local_path.symlink_to(entry_path)
 
     # Install vundle last because it requires .vimrc
-    install_vundle()
+    # NOTE: no longer installing vundle as I'm using neovim
+    # install_vundle()
 
 def main() -> None:
     dotfiles_dir_path = Path(__file__).parent / "dotfiles"
