@@ -29,8 +29,10 @@ LINUX_PACKAGES = [
     *NEOVIM_LINUX_DEPS,
 ]
 
+
 def log(msg):
     print(f"> {msg}")
+
 
 def install_linux_packages():
     log("Running `apt update`")
@@ -40,37 +42,71 @@ def install_linux_packages():
         os.system(f"apt-get install -y {package}")
     log("Finished installing linux packages")
 
+
 def install_fzf():
     log("Installing fzf")
     os.system("git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf")
     os.system("~/.fzf/install --key-bindings --completion --no-update-rc")
     log("Finished installing fzf")
 
+
 def install_neovim():
     log("Installing neovim")
-    os.system("git clone --depth 1 --branch v0.8.1 https://github.com/neovim/neovim /tmp/neovim")
+    os.system(
+        "git clone --depth 1 --branch v0.8.1 https://github.com/neovim/neovim /tmp/neovim"
+    )
     os.system("cd /tmp/neovim && make CMAKE_BUILD_TYPE=RelWithDebInfo && make install")
     os.system("mkdir -p ~/.config/nvim/lua")
-    os.system("wget https://raw.githubusercontent.com/craigrosie/prefs/master/neovim/init.lua -O ~/.config/nvim/init.lua")
-    os.system("wget https://raw.githubusercontent.com/craigrosie/prefs/master/neovim/lua/plugins.lua -O ~/.config/nvim/lua/plugins.lua")
-    os.system("git clone --depth 1 https://github.com/wbthomason/packer.nvim /usr/local/share/nvim/site/pack/packer/start/packer.nvim")
-    os.system("mkdir -p /neovenv")
-    os.system("cd /neovenv && poetry new . && poetry add pynvim && poetry add debugpy && cd -")
-    os.system("sed -i 's/\\/Users\\/craigrosie\\/.pyenv\\/versions\\/neovim-3.11.0/\\/neovenv\\/.venv/g' ~/.config/nvim/init.lua")
-    os.system("sed -i 's/~\\/.pyenv\\/versions\\/debugpy-3.11.0/\\/neovenv\\/.venv/g' ~/.config/nvim/init.lua")
+    os.system(
+        "wget https://raw.githubusercontent.com/craigrosie/prefs/master/neovim/init.lua -O ~/.config/nvim/init.lua"
+    )
+    os.system(
+        "wget https://raw.githubusercontent.com/craigrosie/prefs/master/neovim/lua/plugins.lua -O ~/.config/nvim/lua/plugins.lua"
+    )
+    os.system(
+        "git clone --depth 1 https://github.com/wbthomason/packer.nvim /usr/local/share/nvim/site/pack/packer/start/packer.nvim"
+    )
+    # os.system("mkdir -p /neovenv")
+    # os.system(
+    #     "cd /neovenv && poetry new . && poetry add pynvim && poetry add debugpy && cd -"
+    # )
+    os.system(
+        "sed -i 's/\\/Users\\/craigrosie\\/.pyenv\\/versions\\/neovim-3.11.0/\\/neovenv\\/.venv/g' ~/.config/nvim/init.lua"
+    )
+    os.system(
+        "sed -i 's/~\\/.pyenv\\/versions\\/debugpy-3.11.0/\\/neovenv\\/.venv/g' ~/.config/nvim/init.lua"
+    )
     log("Finished installing neovim")
+
 
 def install_snippets():
     log("Installing snippets")
     os.system("mkdir -p ~/.config/nvim/custom_snippets")
-    os.system("wget https://raw.githubusercontent.com/craigrosie/prefs/master/vim/ultisnips/markdown.snippets -O ~/.config/nvim/custom_snippets/markdown.snippets")
-    os.system("wget https://raw.githubusercontent.com/craigrosie/prefs/master/vim/ultisnips/python.snippets -O ~/.config/nvim/custom_snippets/python.snippets")
+    os.system(
+        "wget https://raw.githubusercontent.com/craigrosie/prefs/master/vim/ultisnips/markdown.snippets -O ~/.config/nvim/custom_snippets/markdown.snippets"
+    )
+    os.system(
+        "wget https://raw.githubusercontent.com/craigrosie/prefs/master/vim/ultisnips/python.snippets -O ~/.config/nvim/custom_snippets/python.snippets"
+    )
     log("Finshed installing snippets")
+
 
 def install_vundle():
     log("Installing vundle")
-    os.system("git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim")
+    os.system(
+        "git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim"
+    )
     log("Finished installing vundle")
+
+
+def setup_neovenv(neovenv_path):
+    log("Setting up /neovenv/")
+    os.system("mkdir -p /neovenv")
+    os.system(
+        f"cd /neovenv && poetry new . && cp {neovenv_path}/poetry.toml /neovenv/ && poetry add pynvim && poetry add debugpy && cd -"
+    )
+    log("Finished setting up /neovenv/")
+
 
 def install(dotfiles_dir_path: Path, dir_path: Path) -> None:
     install_fzf()
@@ -100,9 +136,13 @@ def install(dotfiles_dir_path: Path, dir_path: Path) -> None:
     # NOTE: no longer installing vundle as I'm using neovim
     # install_vundle()
 
+
 def main() -> None:
     dotfiles_dir_path = Path(__file__).parent / "dotfiles"
+    neovenv_path = Path(__file__).parent / "neovenv"
+    setup_neovenv(neovenv_path)
     install(dotfiles_dir_path, dotfiles_dir_path)
+
 
 if __name__ == "__main__":
     main()

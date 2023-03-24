@@ -1,0 +1,5 @@
+[installer]
+# HACK: This project depends on several broken wheels, which are rejected by the new, fast installer included in
+# `poetry>=1.4`.
+# TODO: Remove this config option when all dependencies install using the new installer.
+modern-installation = false
