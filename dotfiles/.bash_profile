@@ -39,7 +39,7 @@ export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 # Set default options for fzf
 export FZF_DEFAULT_OPTS="--height 30% --reverse --cycle"
 
-export EDITOR=`command -v vim`
+export EDITOR=nvim
 
 # Automate ssh-agent startup
 # https://superuser.com/questions/1152833/save-identities-added-by-ssh-add-so-they-persist
@@ -48,9 +48,6 @@ export EDITOR=`command -v vim`
 # Prevent pip from installing packages outside of a virtualenv
 # https://switowski.com/blog/disable-pip-outside-of-virtual-environments
 export PIP_REQUIRE_VIRTUALENV=true
-
-# Make vim the default git editor
-export GIT_EDITOR=vim
 
 echo "System online ✔︎"
 
