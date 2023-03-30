@@ -57,6 +57,10 @@ def install_lazygit():
     )
     os.system("tar xf /tmp/lazygit.tar.gz --directory=/tmp/")
     os.system("install /tmp/lazygit /usr/local/bin")
+    os.system("rm ~/.config/lazygit/config.yml")
+    os.system(
+        "wget https://raw.githubusercontent.com/craigrosie/prefs/master/osx/lazygit/config.yml -O ~/.config/lazygit/config.yml"
+    )
     log("Finished installing lazygit")
 
 
