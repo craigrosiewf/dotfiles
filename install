@@ -50,6 +50,16 @@ def install_fzf():
     log("Finished installing fzf")
 
 
+def install_lazygit():
+    log("Installing lazygit")
+    os.system(
+        'curl -Lo /tmp/lazygit.tar.gz "https://github.com/jesseduffield/lazygit/releases/download/v0.37.0/lazygit_0.37.0_Linux_x86_64.tar.gz"'
+    )
+    os.system("tar xf /tmp/lazygit.tar.gz --directory=/tmp/")
+    os.system("install /tmp/lazygit /usr/local/bin")
+    log("Finished installing lazygit")
+
+
 def install_neovim():
     log("Installing neovim")
     os.system(
@@ -113,6 +123,7 @@ def install(dotfiles_dir_path: Path, dir_path: Path) -> None:
     install_linux_packages()
     install_neovim()
     install_snippets()
+    install_lazygit()
 
     for entry in os.scandir(dir_path):
         entry_path = dir_path / entry.name
