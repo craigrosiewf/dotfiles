@@ -67,7 +67,7 @@ def install_lazygit():
 def install_neovim():
     log("Installing neovim")
     os.system(
-        "git clone --depth 1 --branch v0.8.3 https://github.com/neovim/neovim /tmp/neovim"
+        "git clone --depth 1 --branch v0.9.0 https://github.com/neovim/neovim /tmp/neovim"
     )
     os.system("cd /tmp/neovim && make CMAKE_BUILD_TYPE=RelWithDebInfo && make install")
     os.system("mkdir -p ~/.config/nvim/lua")
