@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import os
 from pathlib import Path
+from typing import Final
 
 NEOVIM_LINUX_DEPS = [
     "ninja-build",
@@ -30,6 +31,7 @@ LINUX_PACKAGES = [
 ]
 
 
+NEOVIM_VERSION: Final[str] = "v0.9.1"
 def log(msg):
     print(f"> {msg}")
 
@@ -67,7 +69,7 @@ def install_lazygit():
 def install_neovim():
     log("Installing neovim")
     os.system(
-        "git clone --depth 1 --branch v0.9.0 https://github.com/neovim/neovim /tmp/neovim"
+        f"git clone --depth 1 --branch {NEOVIM_VERSION} https://github.com/neovim/neovim /tmp/neovim"
     )
     os.system("cd /tmp/neovim && make CMAKE_BUILD_TYPE=RelWithDebInfo && make install")
     os.system("mkdir -p ~/.config/nvim/lua")
